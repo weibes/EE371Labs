@@ -1,14 +1,12 @@
-module delay_adder(Clock, enable, D, D_Add, Q, Sum_Add);
+module delay_adder(Clock, enable, D, Q, Q_Div);
 
 	input logic Clock, enable;
-	input logic [20:0] D;
-	input logic [23:0] D_Add;
-	output logic [20:0] Q;
-	output logic [23:0] Sum_Add;
+	input logic signed [23:0] D;
+	output logic signed [23:0] Q, Q_Div;
 	
 	
 	always_comb 
-		Sum_Add = D_Add + {3'b000, Q};
+		Q_Div = Q / 8;
 	
 	always_ff @(posedge Clock) begin
 		if(enable)
@@ -20,10 +18,10 @@ endmodule
 module delay_adder_testbench();
 
 	logic Clock, enable;
-	logic [20:0] D;
-	logic [23:0] D_Add;
-	logic [20:0] Q;
-	logic [23:0] Sum_Add;	
+	logic signed [20:0] D;
+	logic signed [23:0] D_Add;
+	logic signed [20:0] Q;
+	logic signed [23:0] Q_Div;	
 	
 	delay_adder dut(.*);
 	
