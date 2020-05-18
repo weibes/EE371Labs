@@ -48,9 +48,9 @@ module task3 (
 
 	/* Your code goes here */
 	
-	nSampleFIRFilter filterLeft (.dataIn(readdata_left), .dataOut(smoothdata_left), .enable(read), .Clock(CLOCK_50));
+	nSampleFIRFilter filterLeft (.dataIn(readdata_left), .dataOut(smoothdata_left), .wren(write), .reen(read), .Clock(CLOCK_50));
 	
-	nSampleFIRFilter filterRight (.dataIn(readdata_right), .dataOut(smoothdata_right), .enable(read), .Clock(CLOCK_50));
+	nSampleFIRFilter filterRight (.dataIn(readdata_right), .dataOut(smoothdata_right), .wren(write), .reen(read), .Clock(CLOCK_50));
 	
 	
 	enum {waiting_read, reading, waiting_write, writing} ps, ns;
