@@ -1,0 +1,9 @@
+*
+!*/
+
+!*.sv
+!*.v
+!*.do
+!*.sof
+!*.qip
+!.gitignore
