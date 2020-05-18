@@ -8,7 +8,7 @@ module nSampleFIRFilter #(parameter N=16) (dataIn, dataOut, wren, reen, Clock);
 	assign dataNormalized = dataIn / N; //N should be 16 rn, but just for test make 32
 	
 	FIFOBuffer16 buffer (.clock(Clock), .data(dataNormalized), .rdreq(reen), .wrreq(wren), .q(dataBuffer));
-	delay_adder delay (.Clock, .enable(reen), .D(dataOut), .Q(dataDelayed));
+	delay_adder delay (.Clock, .enable(wren), .D(dataOut), .Q(dataDelayed));
 	
 	assign dataSumBuffer = (dataBuffer * -1) + dataNormalized;
 	assign dataOut = dataDelayed + dataSumBuffer;
