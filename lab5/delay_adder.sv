@@ -31,23 +31,49 @@ module delay_adder_testbench();
 		
 	initial begin
 		// checks whether inputs numbers and divides correctly.
-		
-		// checks for a positve set of number
 		enable <= 1'b0;					               	@(posedge Clock);
+		
+		// checks division for a big positive number
 		D <= 24'b000000000000000010000000;              @(posedge Clock);
 		enable <= 1'b1;						               @(posedge Clock);            
 		enable <= 1'b0;					                	@(posedge Clock);
 		
-		// checks division with another set of negative number
+		// checks division for a small positive number
+		D <= 24'b000000000000000000001000;              @(posedge Clock);
+		enable <= 1'b1;						               @(posedge Clock);            
+		enable <= 1'b0;					                	@(posedge Clock);
+		
+		// checks division for a big negative number
+		D <= 24'b111111111111111110000000;              @(posedge Clock);
+		enable <= 1'b1;						               @(posedge Clock);  
+		enable <= 1'b0;						               @(posedge Clock);
+		
+		// checks division for a small negative number
+		D <= 24'b111111111111111111111000;              @(posedge Clock);
+		enable <= 1'b1;						               @(posedge Clock);  
+		enable <= 1'b0;						               @(posedge Clock);
+
+		// checks division for a small positive number, giving 0 as ouput
+		D <= 24'b000000000000000000000001;              @(posedge Clock);
+		enable <= 1'b1;						               @(posedge Clock);            
+		enable <= 1'b0;					                	@(posedge Clock);
+		
+		// checks division for a small negative number, giving 0 as output
 		D <= 24'b111111111111111111111111;              @(posedge Clock);
 		enable <= 1'b1;						               @(posedge Clock);  
 		enable <= 1'b0;						               @(posedge Clock);
-					                  	                	@(posedge Clock);	
+		
+		// checks division for 0 as input number, giving a undefined as ouput
+		D <= 24'b000000000000000000000000;              @(posedge Clock);
+		enable <= 1'b1;						               @(posedge Clock);            
+		enable <= 1'b0;					                	@(posedge Clock);
+		
+		repeat(6)      			                  	  	@(posedge Clock);	
 					                  	               	@(posedge Clock);	
 		$stop;
 		end
 		
 endmodule
-		
+			
 		
 	
