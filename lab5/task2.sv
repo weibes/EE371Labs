@@ -40,7 +40,7 @@ module task2 (
 	output logic AUD_DACDAT;
 	
 	logic read_ready, write_ready, read, write;
-	logic signed [23:0] readdata_left, readdata_right;
+	logic signed [23:0] readdata_left, readdata_right, noise_left, noise_right, noisydata_left, noisydata_right;
 	logic signed [23:0] writedata_left, writedata_right;
 	logic reset; 
 	logic signed [23:0] delay_left1, delay_right1, delay_left2, delay_right2, delay_left3, delay_right3, delay_left4, delay_right4, delay_left5, delay_right5, delay_left6, delay_right6, delay_left7, delay_right7;      
@@ -50,8 +50,14 @@ module task2 (
 
 	/* Your code goes here */
 	
-	delay_adder delayleft1(.Clock(CLOCK_50), .enable(read), .D(readdata_left), .Q(delay_left1), .Q_Div(sum_left1));
-	delay_adder delayright1(.Clock(CLOCK_50), .enable(read), .D(readdata_right), .Q(delay_right1), .Q_Div(sum_right1));
+	noise_generator leftNoise (.clk(Clock), .enable(read), .Q(noise_left));
+	noise_generator rightNoise (.clk(Clock), .enable(read), .Q(noise_right));
+	
+	assign noisydata_left = readdata_left + noise_left;
+	assign noisydata_right = readdata_right + noise_right;
+	
+	delay_adder delayleft1(.Clock(CLOCK_50), .enable(read), .D(noisydata_left), .Q(delay_left1), .Q_Div(sum_left1));
+	delay_adder delayright1(.Clock(CLOCK_50), .enable(read), .D(noisydata_right), .Q(delay_right1), .Q_Div(sum_right1));
 	
 	delay_adder delayleft2(.Clock(CLOCK_50), .enable(read), .D(delay_left1), .Q(delay_left2), .Q_Div(sum_left2));
 	delay_adder delayright2(.Clock(CLOCK_50), .enable(read), .D(delay_right1), .Q(delay_right2), .Q_Div(sum_right2));
@@ -71,8 +77,8 @@ module task2 (
 	delay_adder delayleft7(.Clock(CLOCK_50), .enable(read), .D(delay_left6), .Q(delay_left7), .Q_Div(sum_left7));
 	delay_adder delayright7(.Clock(CLOCK_50), .enable(read), .D(delay_right6), .Q(delay_right7), .Q_Div(sum_right7));	
 	
-	assign sum_left0 = readdata_left / 8;
-	assign sum_right0 = readdata_right / 8;
+	assign sum_left0 = noisydata_left / 8;
+	assign sum_right0 = noisydata_right / 8;
 	
 	assign smoothdata_left = (sum_left0 + sum_left1 + sum_left2 + sum_left3 + sum_left4 + sum_left5 + sum_left6 + sum_left7);
 	assign smoothdata_right = (sum_right0 + sum_right1 + sum_right2 + sum_right3 + sum_right4 + sum_right5 + sum_right6 + sum_right7);

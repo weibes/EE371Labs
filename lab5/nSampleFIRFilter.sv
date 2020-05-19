@@ -1,3 +1,13 @@
+/* module nSampleFIRFilter creates an N sized FIR Filter
+	Inputs:
+			dataIn is input data to be filtered
+			wren is write enable ti sync properly with outside modules
+			reen is read enable to sync properly with outside modules
+			Clock is clock for synronous operation
+	Output:
+			dataOut is filtered output data
+*/
+
 module nSampleFIRFilter (dataIn, dataOut, wren, reen, Clock);
 	input logic wren, reen, Clock;
 	input logic signed [23:0] dataIn;
@@ -15,7 +25,6 @@ module nSampleFIRFilter (dataIn, dataOut, wren, reen, Clock);
 	
 	assign dataSumBuffer = (dataBuffer * -1) + dataNormalized;
 	assign dataOut = dataDelayed + dataSumBuffer;
-
 	
 endmodule // module nSampleFIRFilter
 
@@ -33,7 +42,7 @@ module nSampleFIRFilter_testbench();
 	end //initial begin
 	
 	initial begin
-
+		dataIn = $random(90);
 		$stop;
 	end //initial begin
 	

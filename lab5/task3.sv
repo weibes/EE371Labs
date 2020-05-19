@@ -40,7 +40,7 @@ module task3 (
 	output logic AUD_DACDAT;
 	
 	logic read_ready, write_ready, read, write;
-	logic signed [23:0] readdata_left, readdata_right;
+	logic signed [23:0] readdata_left, readdata_right, noise_left, noise_right, noisydata_left, noisydata_right;
 	logic signed [23:0] writedata_left, writedata_right;
 	logic reset; 
 	logic signed [23:0] smoothdata_left, smoothdata_right;
@@ -48,9 +48,15 @@ module task3 (
 
 	/* Your code goes here */
 	
-	nSampleFIRFilter filterLeft (.dataIn(readdata_left), .dataOut(smoothdata_left), .wren(write), .reen(read), .Clock(CLOCK_50));
+	noise_generator leftNoise (.clk(Clock), .enable(read), .Q(noise_left));
+	noise_generator rightNoise (.clk(Clock), .enable(read), .Q(noise_right));
 	
-	nSampleFIRFilter filterRight (.dataIn(readdata_right), .dataOut(smoothdata_right), .wren(write), .reen(read), .Clock(CLOCK_50));
+	assign noisydata_left = readdata_left + noise_left;
+	assign noisydata_right = readdata_right + noise_right;
+	
+	nSampleFIRFilter filterLeft (.dataIn(noisydata_left), .dataOut(smoothdata_left), .wren(write), .reen(read), .Clock(CLOCK_50));
+	
+	nSampleFIRFilter filterRight (.dataIn(noisydata_right), .dataOut(smoothdata_right), .wren(write), .reen(read), .Clock(CLOCK_50));
 	
 	
 	enum {waiting_read, reading, waiting_write, writing} ps, ns;
