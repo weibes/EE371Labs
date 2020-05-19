@@ -7,7 +7,7 @@
 	Output:
 			dataOut is filtered output data
 */
-
+`timescale 1 ps / 1 ps
 module nSampleFIRFilter (dataIn, dataOut, wren, reen, Clock);
 	input logic wren, reen, Clock;
 	input logic signed [23:0] dataIn;
@@ -33,7 +33,6 @@ module nSampleFIRFilter_testbench();
 	logic wren, reen, Clock;
 	logic signed [23:0] dataIn, dataOut;
 	
-	nSampleFIRFilter dut (.*);
 	
 	parameter clk_per = 100;
 	initial begin
@@ -41,8 +40,81 @@ module nSampleFIRFilter_testbench();
 		forever #(clk_per/2) Clock <= ~Clock;
 	end //initial begin
 	
+	nSampleFIRFilter dut (.*);
+	
 	initial begin
-		dataIn = $random(90);
+		dataIn = 40;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = -20;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 23;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 4;		reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 0;		reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = -170;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 120;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 23;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = -40;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 340;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = -500;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
+		dataIn = 30;	reen = 1;	wren = 0;	@(posedge Clock);
+							reen = 0;	wren = 1;	@(posedge Clock);
 		$stop;
 	end //initial begin
 	

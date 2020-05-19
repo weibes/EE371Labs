@@ -47,9 +47,9 @@ module task3 (
 	assign reset = ~KEY[0];
 
 	/* Your code goes here */
-	
-	noise_generator leftNoise (.clk(Clock), .enable(read), .Q(noise_left));
-	noise_generator rightNoise (.clk(Clock), .enable(read), .Q(noise_right));
+	// generate noise, add to input data
+	noise_generator leftNoise (.clk(CLOCK_50), .enable(read), .Q(noise_left));
+	noise_generator rightNoise (.clk(CLOCK_50), .enable(read), .Q(noise_right));
 	
 	assign noisydata_left = readdata_left + noise_left;
 	assign noisydata_right = readdata_right + noise_right;
@@ -69,22 +69,22 @@ module task3 (
 		waiting_read: begin
 			if(read_ready) ns = reading;
 			else ns = waiting_read;
-		end
+		end // waiting_read: begin
 		reading: begin
 			read = 1'b1;
 			ns = waiting_write;
-		end
+		end // reading: begin
 		waiting_write: begin
 			if(write_ready) ns = writing;
 			else ns = waiting_write;
-		end
+		end // waiting_write: begin
 		writing: begin
 			write = 1'b1;
 			ns = waiting_read;
-		end
-		endcase
+		end // writing: begin
+		endcase // case(ps)
 	
-	end
+	end // always_comb begin
 	
 	always_ff @(posedge CLOCK_50) begin
 		if(reset)
@@ -94,10 +94,10 @@ module task3 (
 			if(read) begin
 				writedata_left <= smoothdata_left;
 				writedata_right <= smoothdata_right;
-			end
+			end // if(read) begin
 			
-		end
-	end
+		end // else begin
+	end // always_ff @(posedge CLOCK_50) begin
 	
 	
 	//assign writedata_left = 	//Your code goes here 

@@ -50,8 +50,8 @@ module task2 (
 
 	/* Your code goes here */
 	
-	noise_generator leftNoise (.clk(Clock), .enable(read), .Q(noise_left));
-	noise_generator rightNoise (.clk(Clock), .enable(read), .Q(noise_right));
+	noise_generator leftNoise (.clk(CLOCK_50), .enable(read), .Q(noise_left));
+	noise_generator rightNoise (.clk(CLOCK_50), .enable(read), .Q(noise_right));
 	
 	assign noisydata_left = readdata_left + noise_left;
 	assign noisydata_right = readdata_right + noise_right;
