@@ -1,22 +1,36 @@
+/* This is submodule for the top level modules of both task1 and task2. The goal
+ * of this module is to take the input and divide the input by 8 and pass it as
+ * an output through a register.
+ * 
+ * Inputs: 
+ * Clock  - the syncronyzed Clock signal.
+ * enable - the enable signal of the system.
+ * D      - the 24 bit external input being passed into the system.
+ *
+ * Outputs:
+ * Q      - the 24 bit external output that is being output through the registers.
+ * Q_Div  - the 24 bit external output that takes care of the initial step when 
+ *          first divides the current output Q by 8.
+ *
+ */
 module delay_adder(Clock, enable, D, Q, Q_Div);
-
 	input logic Clock, enable;
 	input logic signed [23:0] D;
 	output logic signed [23:0] Q, Q_Div;
 	
-	
 	always_comb 
 		Q_Div = Q / 8;
+	//always_comb
 	
 	always_ff @(posedge Clock) begin
 		if(enable)
 			Q <= D;
-	end
+	end //always_ff
 endmodule 
 
-
+// Testbench for delay_adder that tests the overall function of the module and outputs
+// produced given the varied inputs. Port connections *see delay_adder module*.
 module delay_adder_testbench();
-
 	logic Clock, enable;
 	logic signed [23:0] D;
 	logic signed [23:0] Q, Q_Div;	
@@ -71,9 +85,5 @@ module delay_adder_testbench();
 		repeat(6)      			                  	  	@(posedge Clock);	
 					                  	               	@(posedge Clock);	
 		$stop;
-		end
-		
-endmodule
-			
-		
-	
+		end //initial
+endmodule //delay_adder_testbench
