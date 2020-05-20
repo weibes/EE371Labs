@@ -1,5 +1,6 @@
-/*This module loads data into the TRDB LCM screen's control registers 
- * after system reset. 
+/* This module is the top level module for task2, which loads and instantiates the
+ * the different modules to be able to implement the Finite Impulse Response (FIR)
+ * filter. Which achieves the goal of filtering the audio noise generating signals that is being outputted. 
  * 
  * Inputs:
  *   CLOCK_50 		- FPGA on board 50 MHz clock
@@ -29,7 +30,6 @@ module task2 (
 	AUD_ADCDAT, 
 	AUD_DACDAT
 );
-
 	input logic CLOCK_50, CLOCK2_50;
 	input logic [0:0] KEY;
 	output logic FPGA_I2C_SCLK;
@@ -39,6 +39,7 @@ module task2 (
 	input logic AUD_ADCDAT;
 	output logic AUD_DACDAT;
 	
+	// hooks up the internal signals and internal reset signal for the system.
 	logic read_ready, write_ready, read, write;
 	logic signed [23:0] readdata_left, readdata_right, noise_left, noise_right, noisydata_left, noisydata_right;
 	logic signed [23:0] writedata_left, writedata_right;
@@ -47,15 +48,15 @@ module task2 (
 	logic signed [23:0] sum_left1, sum_right1, sum_left2, sum_right2, sum_left3, sum_right3, sum_left4, sum_right4, sum_left5, sum_right5, sum_left6, sum_right6, sum_left7, sum_right7, sum_left0, sum_right0;
 	logic signed [23:0] smoothdata_left, smoothdata_right;
 	assign reset = ~KEY[0];
-
-	/* Your code goes here */
 	
+	/* instantiates the connected modules within the top level module of task2 */
 	noise_generator leftNoise (.clk(CLOCK_50), .enable(read), .Q(noise_left));
 	noise_generator rightNoise (.clk(CLOCK_50), .enable(read), .Q(noise_right));
 	
 	assign noisydata_left = readdata_left + noise_left;
 	assign noisydata_right = readdata_right + noise_right;
 	
+	// instantiates the 7 instances of the registers being inputted into the divider circuit and being outputted.
 	delay_adder delayleft1(.Clock(CLOCK_50), .enable(read), .D(noisydata_left), .Q(delay_left1), .Q_Div(sum_left1));
 	delay_adder delayright1(.Clock(CLOCK_50), .enable(read), .D(noisydata_right), .Q(delay_right1), .Q_Div(sum_right1));
 	
@@ -77,12 +78,15 @@ module task2 (
 	delay_adder delayleft7(.Clock(CLOCK_50), .enable(read), .D(delay_left6), .Q(delay_left7), .Q_Div(sum_left7));
 	delay_adder delayright7(.Clock(CLOCK_50), .enable(read), .D(delay_right6), .Q(delay_right7), .Q_Div(sum_right7));	
 	
+	// instaniates the initial sum being divided before going into the register.
 	assign sum_left0 = noisydata_left / 8;
 	assign sum_right0 = noisydata_right / 8;
 	
+	// instaniates the total sum of the adder block of the signal being outputted from the registers.
 	assign smoothdata_left = (sum_left0 + sum_left1 + sum_left2 + sum_left3 + sum_left4 + sum_left5 + sum_left6 + sum_left7);
 	assign smoothdata_right = (sum_right0 + sum_right1 + sum_right2 + sum_right3 + sum_right4 + sum_right5 + sum_right6 + sum_right7);
 	
+	/* Creates an FSM to assert ready signals to be read and write appropriately*/
 	enum {waiting_read, reading, waiting_write, writing} ps, ns;
 	
 	always_comb begin
@@ -108,7 +112,7 @@ module task2 (
 		end
 		endcase
 	
-	end
+	end //always_comb
 	
 	always_ff @(posedge CLOCK_50) begin
 		if(reset)
@@ -121,14 +125,9 @@ module task2 (
 			end
 			
 		end
-	end
+	end // always_ff
 	
-	
-	//assign writedata_left = 	//Your code goes here 
-	//assign writedata_right = 	//Your code goes here 
-	//assign read = 				//Your code goes here 
-	//assign write = 				//Your code goes here 
-	
+	/* instantiates the connected modules within the top level module of task2 */
 	clock_generator my_clock_gen(
 		CLOCK2_50,
 		reset,
@@ -157,6 +156,4 @@ module task2 (
 		readdata_left, readdata_right,
 		AUD_DACDAT
 	);
-
-endmodule
-
+endmodule // task2
