@@ -1,5 +1,5 @@
-/*This module loads data into the TRDB LCM screen's control registers 
- * after system reset. 
+/*This module is the top level module for task1, which loads and instantiates the
+ * the different modules to be able to generate the intial starter audio signals that is being outputted. 
  * 
  * Inputs:
  *   CLOCK_50 		- FPGA on board 50 MHz clock
@@ -39,13 +39,14 @@ module task1 (
 	input logic AUD_ADCDAT;
 	output logic AUD_DACDAT;
 	
+	// hooks up the internal signals and internal reset signal for the system.
 	logic read_ready, write_ready, read, write;
 	logic [23:0] readdata_left, readdata_right;
 	logic [23:0] writedata_left, writedata_right;
 	logic reset; 
 	assign reset = ~KEY[0];
 
-	/* Your code goes here */
+	/* Creates an FSM to assert ready signals to be read and write appropriately*/
 	enum {waiting_read, reading, waiting_write, writing} ps, ns;
 	
 	always_comb begin
@@ -71,7 +72,7 @@ module task1 (
 		end
 		endcase
 	
-	end
+	end //always_comb
 	
 	always_ff @(posedge CLOCK_50) begin
 		if(reset)
@@ -82,16 +83,10 @@ module task1 (
 				writedata_left <= readdata_left;
 				writedata_right <= readdata_right;
 			end
-			
 		end
-	end
+	end //always_ff
 	
-	
-	//assign writedata_left = 	//Your code goes here 
-	//assign writedata_right = 	//Your code goes here 
-	//assign read = 				//Your code goes here 
-	//assign write = 				//Your code goes here 
-	
+	// instantiates the connected modules within the top level module of task1
 	clock_generator my_clock_gen(
 		CLOCK2_50,
 		reset,
