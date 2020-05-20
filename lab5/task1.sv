@@ -29,7 +29,6 @@ module task1 (
 	AUD_ADCDAT, 
 	AUD_DACDAT
 );
-
 	input logic CLOCK_50, CLOCK2_50;
 	input logic [0:0] KEY;
 	output logic FPGA_I2C_SCLK;
@@ -116,6 +115,4 @@ module task1 (
 		AUD_DACDAT
 	);
 
-endmodule
-
-
+endmodule //task1
