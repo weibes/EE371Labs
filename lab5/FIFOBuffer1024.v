@@ -81,7 +81,7 @@ module FIFOBuffer1024 (
 		scfifo_component.use_eab = "ON";
 
 
-endmodule
+endmodule //FIFOBuffer1024
 
 // ============================================================
 // CNX file retrieval info
