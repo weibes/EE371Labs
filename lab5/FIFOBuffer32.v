@@ -80,7 +80,6 @@ module FIFOBuffer32 (
 		scfifo_component.underflow_checking = "ON",
 		scfifo_component.use_eab = "ON";
 
-
 endmodule //FIFOBuffer32
 
 // ============================================================
