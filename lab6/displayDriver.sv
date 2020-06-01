@@ -1,6 +1,6 @@
-module displayDriver(dataIn, clock, VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
+module displayDriver(dataIn, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
 	input logic [39:0] dataIn [9:0];
-	input logic clock;
+	input logic Clock, Reset;
 	
 	output [7:0] VGA_R;
 	output [7:0] VGA_G;
@@ -10,6 +10,23 @@ module displayDriver(dataIn, clock, VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, V
 	output VGA_HS;
 	output VGA_SYNC_N;
 	output VGA_VS;
+	
+	
+	enum {draw_board, game_play, game_over} ps, ns;
+	
+	
+	
+	always_comb begin
+		case (ps)
+			draw_board:	if (
+	
+	end // always_comb begin
+	
+	
+	always_ff @(posedge Clock) begin
+		
+	
+	end // always_ff @(posedge Clock) begin
 	
 	
 	VGA_framebuffer fb (
