@@ -55,7 +55,7 @@ module boardDrawer(Clock, Reset, enable, x, y, blackNotWhite, doneBit);
 	// assign outputs: done, x, and blackNotWhite
 	// y is already defined in always_comb block and always_ff block
 	assign doneBit = (ps == loop) && (ns == done);
-	assign x = {3'b000, 7'd120} + {3'b000, xCounter};
+	assign x = 260 + xCounter;
 	assign blackNotWhite = array[y][xCounter];
 	
 	always_ff @(posedge Clock) begin

@@ -13,9 +13,11 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	output VGA_SYNC_n;
 	output VGA_VS;
 	
+//	output logic [9:0] xDebug;
+	
 	logic [9:0] x, nextX, xBoard, xBlocks;
 	logic [8:0] y, nextY, yBoard, yBlocks;
-	logic boardDone, BNWBoard, BNWBlocks, pixel_color;
+	logic boardDone, BNWBoard, BNWBlocks, pixel_color, next_pixel_color;
 	
 	enum {draw_board, draw_blocks} ps, ns;
 	
@@ -51,18 +53,23 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	// set RGB value to white or black, depending on output bit of board/block drawers
 	always_comb begin
 		// initialized vals 
-		pixel_color = 1'b0; // assuming 0 is black, fix if not
+		next_pixel_color = pixel_color; // assuming 0 is black, fix if not
 		nextX = x;
 		nextY = y;
 		if (ps == draw_board) begin
 			nextX = xBoard;
 			nextY = yBoard;
-			pixel_color = ~BNWBoard;
+			next_pixel_color = ~BNWBoard;
 		end // if (ps == draw_board) begin
 		else if (ps == draw_blocks) begin
+			// debug
+//			nextX = 0;
+//			nextY = 0;
+//			next_pixel_color = 0;
+
 			nextX = xBlocks;
 			nextY = yBlocks;
-			pixel_color = ~BNWBlocks;
+			next_pixel_color = ~BNWBlocks;
 		end // else if (ps == draw_blocks) begin
 	end // always_comb begin
 	
@@ -70,10 +77,12 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 		if (Reset) begin
 			x <= 0;
 			y <= 0;
+			pixel_color <= 0;
 		end // if (Reset) begin
 		else begin
 			x <= nextX;
 			y <= nextY;
+			pixel_color <= next_pixel_color;
 		end // else begin
 	end // always_ff @(posedge Clock) begin
 	
@@ -83,5 +92,49 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	.pixel_color, .pixel_write(1'b1),
 	.VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS, .VGA_BLANK_n, .VGA_SYNC_n);
 	
-endmodule
+	
+	
+	//assign xDebug = x;
+	
+endmodule // module displayDriver
+
+module displayDriver_testbench();
+
+	logic [9:0] dataIn;
+	logic Clock, Reset;
+	
+	//logic [9:0] xDebug;
+	
+	logic [5:0] rdaddress;
+	logic [7:0] VGA_R;
+	logic [7:0] VGA_G;
+	logic [7:0] VGA_B;
+	logic VGA_BLANK_n;
+	logic VGA_CLK;
+	logic VGA_HS;
+	logic VGA_SYNC_n;
+	logic VGA_VS;
+	
+		// Set up the clock.
+	parameter CLOCK_PERIOD=100;
+	initial begin
+		Clock <= 0;
+		forever #(CLOCK_PERIOD/2) Clock <= ~Clock;
+	end // initial begin
+	
+	displayDriver dut (.*);
+	
+	integer i;
+	initial begin
+		Reset = 1;										@(posedge Clock);
+		Reset = 0;	dataIn = 10'b1001001001;	@(posedge Clock);
+			for (i = 0; i < 500000; i++) begin
+				@(posedge Clock);
+				//assert(~((rdaddress != 0) && (xDebug == 272))) else $fatal(1, "drew to x=272 at %d", $time());
+			end // for (i = 0; i < 100000; i++) begin
+		
+		$stop;
+	end // initial begin
+	
+endmodule // module displayDriver_testbench
 
