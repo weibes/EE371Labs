@@ -7,9 +7,16 @@ add wave -noupdate /boardDrawer_testbench/blackNotWhite
 add wave -noupdate /boardDrawer_testbench/doneBit
 add wave -noupdate -radix unsigned /boardDrawer_testbench/x
 add wave -noupdate -radix unsigned /boardDrawer_testbench/y
+add wave -noupdate -expand -group intenrals -radix unsigned /boardDrawer_testbench/dut/x
+add wave -noupdate -expand -group intenrals -radix unsigned /boardDrawer_testbench/dut/y
+add wave -noupdate -expand -group intenrals -radix unsigned /boardDrawer_testbench/dut/xCounter
+add wave -noupdate -expand -group intenrals -radix unsigned /boardDrawer_testbench/dut/nextXCounter
+add wave -noupdate -expand -group intenrals -radix unsigned /boardDrawer_testbench/dut/nextY
+add wave -noupdate -expand -group intenrals /boardDrawer_testbench/dut/ps
+add wave -noupdate -expand -group intenrals /boardDrawer_testbench/dut/ns
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ps} 0}
-quietly wave cursor active 0
+WaveRestoreCursors {{Cursor 1} {14381 ps} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -24,4 +31,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {1 ns}
+WaveRestoreZoom {13217 ps} {14649 ps}

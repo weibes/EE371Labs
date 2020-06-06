@@ -15,6 +15,20 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	
 //	output logic [9:0] xDebug;
 	
+//	// debug counter:
+//	logic [24:0] cnt;
+//	always_ff @(posedge clock) begin
+//		if (Reset)
+//			cnt <= 0;
+//		else
+//			cnt <= cnt + 1;
+//	end // always_ff
+//	
+//	//debug Clock TODO rename input clock back to normal, on input name, in fctn, and in DE1_SoC file
+//	logic Clock;
+//	assign Clock = cnt[15];
+//	
+	
 	logic [9:0] x, nextX, xBoard, xBlocks;
 	logic [8:0] y, nextY, yBoard, yBlocks;
 	logic boardDone, BNWBoard, BNWBlocks, pixel_color, next_pixel_color;
@@ -98,6 +112,7 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	
 endmodule // module displayDriver
 
+
 module displayDriver_testbench();
 
 	logic [9:0] dataIn;
@@ -137,4 +152,5 @@ module displayDriver_testbench();
 	end // initial begin
 	
 endmodule // module displayDriver_testbench
+
 

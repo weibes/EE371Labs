@@ -20,7 +20,7 @@ module boardDrawer(Clock, Reset, enable, x, y, blackNotWhite, doneBit);
 					ns = ready;
 			end // ready: begin
 			loop: begin
-				if(xCounter == 119 && y == 479)
+				if(xCounter == 118 && y == 479)
 					ns = done;
 				else
 					ns = loop;
@@ -42,7 +42,7 @@ module boardDrawer(Clock, Reset, enable, x, y, blackNotWhite, doneBit);
 			nextY = 0;
 		end // if ((ps == ready) && (ns == loop)) begin
 		else if ((ps == loop) && (ns == loop)) begin
-			if (xCounter == 7'd119) begin
+			if (xCounter == 7'd118) begin
 				nextXCounter = 0;
 				nextY = nextY + 1'b1;
 			end // if (xCounter == 7'd119) begin

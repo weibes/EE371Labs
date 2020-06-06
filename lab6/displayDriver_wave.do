@@ -16,13 +16,25 @@ add wave -noupdate -group boardInternals -radix unsigned /displayDriver_testbenc
 add wave -noupdate -group boardInternals -radix unsigned /displayDriver_testbench/dut/yBoard
 add wave -noupdate -group boardInternals /displayDriver_testbench/dut/boardDone
 add wave -noupdate -group boardInternals /displayDriver_testbench/dut/BNWBoard
-add wave -noupdate -group blockInternals -radix unsigned /displayDriver_testbench/dut/xBlocks
-add wave -noupdate -group blockInternals -radix unsigned /displayDriver_testbench/dut/yBlocks
-add wave -noupdate -group blockInternals /displayDriver_testbench/dut/BNWBlocks
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/x
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/y
+add wave -noupdate -expand -group blockInternals /displayDriver_testbench/dut/blocks/nextBlackNotWhite
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/nextX
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/nextY
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/xBlockCoord
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/nextXBlockCoord
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/yBlockCoord
+add wave -noupdate -expand -group blockInternals -radix decimal /displayDriver_testbench/dut/blocks/nextYBlockCoord
+add wave -noupdate -expand -group blockInternals -radix unsigned /displayDriver_testbench/dut/blocks/xInternal
+add wave -noupdate -expand -group blockInternals -radix unsigned /displayDriver_testbench/dut/blocks/yInternal
+add wave -noupdate -expand -group blockInternals -radix unsigned /displayDriver_testbench/dut/blocks/nextXInternal
+add wave -noupdate -expand -group blockInternals -radix unsigned /displayDriver_testbench/dut/blocks/nextYInternal
+add wave -noupdate -expand -group blockInternals /displayDriver_testbench/dut/blocks/ps
+add wave -noupdate -expand -group blockInternals /displayDriver_testbench/dut/blocks/ns
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {5760313 ps} 0}
+WaveRestoreCursors {{Cursor 1} {5762512 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 150
+configure wave -namecolwidth 202
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -36,4 +48,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {5760145 ps} {5761145 ps}
+WaveRestoreZoom {5762374 ps} {5763324 ps}

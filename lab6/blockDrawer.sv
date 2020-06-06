@@ -8,8 +8,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 	output logic [9:0] x;
 	output logic [8:0] y;
 	
-	logic [9:0] nextX;
-	logic [8:0] nextY;
+	logic nextBlackNotWhite;
+	logic [9:0] nextX, nextNextX;
+	logic [8:0] nextY, nextNextY;
 	logic [10:0] array [10:0];
 	
 	// give coordinates of grid of blocks visible to player
@@ -30,9 +31,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 		nextYBlockCoord = yBlockCoord;
 		nextXInternal = xInternal;
 		nextYInternal = yInternal;
-		nextX = x;
-		nextY = y;
-		blackNotWhite = 1'b1;
+		nextNextX = nextX;
+		nextNextY = nextY;
+		nextBlackNotWhite = 1'b1;
 		
 		case(ps) 
 			ready: begin
@@ -48,9 +49,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 					ns = erase;
 			end // loop: begin
 			draw: begin
-				if (xInternal == 4'd10) begin
+				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
-					if (yInternal == 4'd10) begin
+					if (yInternal == 4'd9) begin
 						if (nextYBlockCoord == 0) 
 							ns = readMem;
 						else
@@ -67,9 +68,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 				end // else begin
 			end // draw: begin
 			erase: begin
-				if (xInternal == 4'd10) begin
+				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
-					if (yInternal == 4'd10) begin
+					if (yInternal == 4'd9) begin
 						if (nextYBlockCoord == 0)
 							ns = readMem;
 						else
@@ -104,15 +105,15 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 		
 		// updateCoords
 		else if (ps == draw || ps == erase) begin
-			nextX = (12 * xBlockCoord) + 261 + xInternal;
-			nextY = (12 * yBlockCoord) + 1 + yInternal;
+			nextNextX = (12 * xBlockCoord) + 261 + xInternal;
+			nextNextY = (12 * yBlockCoord) + 1 + yInternal;
 		end // else if (ps == draw || ps == erase) begin
 		
 		// blackNotWhite output
 		if (ps == loop && ns == erase) 
-			blackNotWhite = 1'b1;
+			nextBlackNotWhite = 1'b1;
 		else if (ps == draw) 
-			blackNotWhite = array[xInternal][yInternal];
+			nextBlackNotWhite = array[xInternal][yInternal];
 		
 		// incrBlockCoords
 		if ((ps == draw || ps == erase) && (ns == loop || ns == readMem)) begin
@@ -138,6 +139,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 			yInternal <= 0;
 			x <= 0;
 			y <= 0;
+			nextX <= 0;
+			nextY <= 0;
+			blackNotWhite <= 1;
 		end // if (Reset) begin
 		else begin
 			ps <= ns;
@@ -146,7 +150,10 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 			xInternal <= nextXInternal;
 			yInternal <= nextYInternal;
 			x <= nextX;
+			nextX <= nextNextX;
 			y <= nextY;
+			nextY <= nextNextY;
+			blackNotWhite <= nextBlackNotWhite;
 		end // else begin
 	end // always_ff @(posedge Clock) begin
 	
