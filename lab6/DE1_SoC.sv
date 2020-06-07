@@ -29,7 +29,7 @@
  */
 
 `timescale 1 ps / 1 ps
-module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
+module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 	VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS,
 	FPGA_I2C_SCLK, 
 	FPGA_I2C_SDAT, 
@@ -38,11 +38,13 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
 	AUD_ADCLRCK, 
 	AUD_BCLK, 
 	AUD_ADCDAT, 
-	AUD_DACDAT);
+	AUD_DACDAT,
+	HEX0, HEX1, LEDR);
 	
 	input logic [3:0] KEY;
 	input logic [9:0] SW;
 	input logic CLOCK_50, CLOCK2_50;
+	input logic PS2_DAT, PS2_CLK;
 	output [7:0] VGA_R;
 	output [7:0] VGA_G;
 	output [7:0] VGA_B;
@@ -51,6 +53,9 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
 	output VGA_HS;
 	output VGA_SYNC_N;
 	output VGA_VS;
+	
+	output logic [6:0] HEX0, HEX1;
+	output logic [9:0] LEDR;
 	
 	output logic FPGA_I2C_SCLK;
 	inout FPGA_I2C_SDAT;
@@ -72,15 +77,28 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
 
 	
 	MusicPlayer music (.CLOCK_50, .CLOCK2_50, .FPGA_I2C_SCLK, .FPGA_I2C_SDAT, .AUD_XCK, .AUD_DACLRCK, .AUD_ADCLRCK, .AUD_BCLK,
-						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable(~KEY[3]));
+						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable(1'b1));
 
-
+	// testRAM, for monitor debug only
 	GraphicsTestRAM gtr (.rdaddress(address_b), .wraddress(12'd0), .clock(CLOCK_50), .q(q_b), .wren(1'b1), .data({~KEY[3], SW, ~KEY[2]}));
 	
 	displayDriver display (.dataIn(q_b), .rdaddress(address_b), .Clock(CLOCK_50), .Reset(~KEY[0]),  .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS, 
 	.VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 
+	keyboardInput keyboard (.Clock(CLOCK_50), .Reset(~KEY[0]), .motion, .motion_enable, .PS2_DAT, .PS2_CLK);
 	
+	// debug for keyboard
+	seg7 displayTest (.bcd({2'b00, motion}), .leds(HEX0));
 	
+	logic [3:0] cnt;
+	always_ff @(posedge CLOCK_50) begin
+		if (~KEY[0])
+			cnt <= 4'b0;
+		else if (motion_enable)
+			cnt <= cnt + 1'b1;
+	end
+	
+	seg7 count (.bcd(cnt), .leds(HEX1));
+	// end debug stuff
 	
 endmodule // module DE1_SoC
