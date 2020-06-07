@@ -71,8 +71,8 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 	logic [11:0] q_b;
 	
 	
-	//playfield field (.Clock(CLOCK_50), .Reset(~KEY[0]), .motion_enable, .piece_ready, .motion, .address_b,
-	//					  .rden_b(1'b1), .q_b, .piece_request)
+	playfield field (.Clock(CLOCK_50), .reset(~KEY[0]), .motion_enable, .motion, .address_b,
+						  .rden_b(1'b1), .q_b);
 	
 
 	
@@ -80,7 +80,7 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable(1'b1));
 
 	// testRAM, for monitor debug only
-	GraphicsTestRAM gtr (.rdaddress(address_b), .wraddress(12'd0), .clock(CLOCK_50), .q(q_b), .wren(1'b1), .data({~KEY[3], SW, ~KEY[2]}));
+	//GraphicsTestRAM gtr (.rdaddress(address_b), .wraddress(12'd0), .clock(CLOCK_50), .q(q_b), .wren(1'b1), .data({~KEY[3], SW, ~KEY[2]}));
 	
 	displayDriver display (.dataIn(q_b), .rdaddress(address_b), .Clock(CLOCK_50), .Reset(~KEY[0]),  .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS, 
 	.VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));

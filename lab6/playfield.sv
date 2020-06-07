@@ -433,3 +433,33 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 		end
 	end
 endmodule
+
+`timescale 1 ps / 1 ps
+module playfield_testbench();
+
+	logic Clock, reset, motion_enable;
+	logic [1:0] motion;
+	logic [4:0] address_b;
+	logic rden_b; 
+	logic [11:0] q_b;
+
+	parameter CLOCK_PERIOD=100;
+	initial begin
+		Clock <= 0;
+		forever #(CLOCK_PERIOD/2) Clock <= ~Clock;
+	end // initial begin
+	
+	playfield dut (.*);
+	
+	integer i;
+	
+	initial begin
+		reset = 1;			@(posedge Clock);
+		reset = 0;			@(posedge Clock);
+		for (i = 0; i < 1000; i++) begin
+			@(posedge Clock);
+		end
+		$stop;
+	end // initial begin
+	
+endmodule // module playfield_testbench()
