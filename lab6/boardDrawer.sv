@@ -9,7 +9,7 @@ module boardDrawer(Clock, Reset, enable, x, yFinal, blackNotWhite, doneBit);
 	logic [8:0] nextY, y;
 	logic [119:0] array [239:0];
 	
-	assign yFinal = y + 120;
+	assign yFinal = y + 9'd120;
 	
 	enum {ready, loop, done} ps, ns;
 	
@@ -57,7 +57,7 @@ module boardDrawer(Clock, Reset, enable, x, yFinal, blackNotWhite, doneBit);
 	// assign outputs: done, x, and blackNotWhite
 	// y is already defined in always_comb block and always_ff block
 	assign doneBit = (ps == loop) && (ns == done);
-	assign x = 260 + xCounter;
+	assign x = 10'd260 + xCounter;
 	assign blackNotWhite = array[y][xCounter];
 	
 	always_ff @(posedge Clock) begin

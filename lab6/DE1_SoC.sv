@@ -59,41 +59,25 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
 	input logic AUD_ADCDAT;
 	output logic AUD_DACDAT;
 	
-	// stuff for keyboard input
 	
-	logic piece_ready, motion_enable;
+	logic piece_ready, motion_enable, piece_request;
 	logic [1:0] motion;
 	logic [4:0] address_b;
-	logic [4:0] arr_out[5:0]; // what does this do????
 	logic [11:0] q_b;
 	
-//	piece_generate generator (.Clock(CLOCK_50), .Reset(~KEY[0]), .request(piece_request), .arr_out, .data_ready(piece_ready));
-//	
-//	playfield field (.Clock(CLOCK_50), .Reset(~KEY[0]), .piece_ready, .motion_enable, .motion, 
-//						  .address_b, .rden_b(1'b1), .q_b, .piece_request);
-//	
-//	
+	
+	//playfield field (.Clock(CLOCK_50), .Reset(~KEY[0]), .motion_enable, .piece_ready, .motion, .address_b,
+	//					  .rden_b(1'b1), .q_b, .piece_request)
+	
+
+	
 //	MusicPlayer music (.CLOCK_50, .CLOCK2_50, .FPGA_I2C_SCLK, .FPGA_I2C_SDAT, .AUD_XCK, .AUD_DACLRCK, .AUD_ADCLRCK, .AUD_BCLK,
 //						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable);
-//	
-	
-	//debug use
-	logic [23:0] counter;
-	logic clk;
-	
-	always_ff @(posedge CLOCK_50) begin
-		if (~KEY[0])
-			counter <= 0;
-		else 
-			counter <= counter + 1;
-	end 
-	
-	assign clk = counter[0];
-	
-	
+
+
 	GraphicsTestRAM gtr (.rdaddress(address_b), .wraddress(12'd0), .clock(CLOCK_50), .q(q_b), .wren(1'b1), .data({~KEY[3], SW, ~KEY[2]}));
 	
-	displayDriver display (.dataIn(q_b), .rdaddress(address_b), .Clock(clk), .CLOCK_50, .Reset(~KEY[0]),  .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS, 
+	displayDriver display (.dataIn(q_b), .rdaddress(address_b), .Clock(CLOCK_50), .Reset(~KEY[0]),  .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS, 
 	.VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 
 	

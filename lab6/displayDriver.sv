@@ -1,10 +1,9 @@
 `timescale 1 ps / 1 ps
-module displayDriver(dataIn, rdaddress, Clock, CLOCK_50, Reset,  VGA_R, VGA_G, VGA_B, VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
+module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
 	input logic [11:0] dataIn;
 	input logic Clock, Reset;
-	input logic CLOCK_50;
 	
-	output logic [5:0] rdaddress;
+	output logic [4:0] rdaddress;
 	output [7:0] VGA_R;
 	output [7:0] VGA_G;
 	output [7:0] VGA_B;
@@ -101,7 +100,7 @@ module displayDriver(dataIn, rdaddress, Clock, CLOCK_50, Reset,  VGA_R, VGA_G, V
 		end // else begin
 	end // always_ff @(posedge Clock) begin
 	
-	VGA_framebuffer VGABuffer (.clk50(CLOCK_50), .reset(Reset), 
+	VGA_framebuffer VGABuffer (.clk50(Clock), .reset(Reset), 
 	.x({1'b0, x}),
 	.y({2'b00, y}),
 	.pixel_color, .pixel_write(1'b1),
@@ -117,11 +116,11 @@ endmodule // module displayDriver
 module displayDriver_testbench();
 
 	logic [11:0] dataIn;
-	logic Clock, Reset, CLOCK_50;
+	logic Clock, Reset;
 	
 	//logic [9:0] xDebug;
 	
-	logic [5:0] rdaddress;
+	logic [4:0] rdaddress;
 	logic [7:0] VGA_R;
 	logic [7:0] VGA_G;
 	logic [7:0] VGA_B;

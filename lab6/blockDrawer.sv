@@ -3,7 +3,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yF
 	input logic Clock, Reset, enable;
 	input logic [11:0] dataIn;
 	
-	output logic [5:0] rdaddress;
+	output logic [4:0] rdaddress;
 	output logic blackNotWhite;
 	output logic [9:0] x;
 	output logic [8:0] yFinal;
@@ -27,7 +27,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yF
 	logic [3:0] xInternal, yInternal, nextXInternal, nextYInternal;
 	
 	
-	enum {ready, loop, draw, erase, readMem, readMem2} ps, ns;
+	enum {ready, loop, draw, erase, readMem} ps, ns;
 	
 	always_comb begin
 		nextXBlockCoord = xBlockCoord;
@@ -54,12 +54,8 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yF
 			draw: begin
 				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
-					if (yInternal == 4'd9) begin
-						if (nextXBlockCoord == 1) 
-							ns = readMem;
-						else
-							ns = loop;
-					end // if (yInternal == 4'd11) begin
+					if (yInternal == 4'd9)
+						ns = readMem;
 					else begin
 						ns = draw;
 						nextYInternal = yInternal + 1'b1;
@@ -73,12 +69,8 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yF
 			erase: begin
 				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
-					if (yInternal == 4'd9) begin
-						if (nextXBlockCoord == 1)
-							ns = readMem;
-						else
-							ns = loop;
-					end // if (yInternal == 4'd11) begin
+					if (yInternal == 4'd9)
+						ns = readMem;
 					else begin
 						ns = erase;
 						nextYInternal = yInternal + 1'b1;
@@ -90,9 +82,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yF
 				end // else begin
 			end // erase: begin
 			readMem:
-				ns = readMem2;
-			readMem2:
 				ns = loop;
+
+
 		endcase // case(ps)
 		
 		// datapath outputs
@@ -184,7 +176,7 @@ module blockDrawer_testbench();
 	logic Clock, Reset, enable;
 	logic [11:0] dataIn;
 	logic blackNotWhite;
-	logic [5:0] rdaddress;
+	logic [4:0] rdaddress;
 	logic [9:0] x;
 	logic [8:0] yFinal;
 	
@@ -202,133 +194,11 @@ module blockDrawer_testbench();
 		Reset = 1'b0;	@(posedge Clock);
 		enable = 1'b1;	@(posedge Clock);
 		dataIn = 12'b010010000010;	@(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
-		@(posedge Clock); @(posedge Clock);
+		@(posedge rdaddress[0]);
+		dataIn = 12'b001111100010; @(posedge Clock);
+		@(negedge rdaddress[0]);
+		dataIn = 12'b111111111000;	@(posedge Clock);
+		@(posedge rdaddress[0]);
 		
 		$stop;
 	end // initial begin
