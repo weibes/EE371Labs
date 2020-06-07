@@ -23,7 +23,8 @@ module playfield(Clock, reset, piece_ready, motion_enable, motion, address_b,
 	pof_RAM storage(.address_a, .address_b, .clock(Clock), .data_a, .data_b(11'b0), 
 						 .rden_a, .rden_b, .wren_a, .wren_b(1'b0), .q_a, .q_b);
 	decoder_4_to_16 decode(.in(decode_in), .out(decode_out));
-	
+	piece_generate pieces (.Clock, .reset, .request(piece_request), 
+									.arr_out(piece), .data_ready(piece_ready));
 	
 	// the internal FSM for controlling the playfield.
 	enum {waiting, down, left, right, cw, ccw} ps, ns;
