@@ -1,7 +1,8 @@
 `timescale 1 ps / 1 ps
-module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
-	input logic [9:0] dataIn;
+module displayDriver(dataIn, rdaddress, Clock, CLOCK_50, Reset,  VGA_R, VGA_G, VGA_B, VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
+	input logic [11:0] dataIn;
 	input logic Clock, Reset;
+	input logic CLOCK_50;
 	
 	output logic [5:0] rdaddress;
 	output [7:0] VGA_R;
@@ -59,9 +60,9 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 	
 	
 	// game board drawing submodule
-	boardDrawer board (.Clock, .Reset, .enable(ps == draw_board), .x(xBoard), .y(yBoard), .blackNotWhite(BNWBoard), .doneBit(boardDone));
+	boardDrawer board (.Clock, .Reset, .enable(ps == draw_board), .x(xBoard), .yFinal(yBoard), .blackNotWhite(BNWBoard), .doneBit(boardDone));
 	
-	blockDrawer blocks (.Clock, .Reset, .enable(ps == draw_blocks), .rdaddress, .dataIn, .x(xBlocks), .y(yBlocks), .blackNotWhite(BNWBlocks));
+	blockDrawer blocks (.Clock, .Reset, .enable(ps == draw_blocks), .rdaddress, .dataIn, .x(xBlocks), .yFinal(yBlocks), .blackNotWhite(BNWBlocks));
 	
 	
 	// set RGB value to white or black, depending on output bit of board/block drawers
@@ -100,7 +101,7 @@ module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_
 		end // else begin
 	end // always_ff @(posedge Clock) begin
 	
-	VGA_framebuffer VGABuffer (.clk50(Clock), .reset(Reset), 
+	VGA_framebuffer VGABuffer (.clk50(CLOCK_50), .reset(Reset), 
 	.x({1'b0, x}),
 	.y({2'b00, y}),
 	.pixel_color, .pixel_write(1'b1),
@@ -115,8 +116,8 @@ endmodule // module displayDriver
 
 module displayDriver_testbench();
 
-	logic [9:0] dataIn;
-	logic Clock, Reset;
+	logic [11:0] dataIn;
+	logic Clock, Reset, CLOCK_50;
 	
 	//logic [9:0] xDebug;
 	
@@ -142,7 +143,7 @@ module displayDriver_testbench();
 	integer i;
 	initial begin
 		Reset = 1;										@(posedge Clock);
-		Reset = 0;	dataIn = 10'b1001001001;	@(posedge Clock);
+		Reset = 0;	dataIn = 12'b010010010010;	@(posedge Clock);
 			for (i = 0; i < 500000; i++) begin
 				@(posedge Clock);
 				//assert(~((rdaddress != 0) && (xDebug == 272))) else $fatal(1, "drew to x=272 at %d", $time());

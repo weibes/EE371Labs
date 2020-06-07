@@ -1,30 +1,33 @@
 `timescale 1 ps / 1 ps
-module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y);
+module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yFinal);
 	input logic Clock, Reset, enable;
-	input logic [9:0] dataIn;
+	input logic [11:0] dataIn;
 	
 	output logic [5:0] rdaddress;
 	output logic blackNotWhite;
 	output logic [9:0] x;
-	output logic [8:0] y;
+	output logic [8:0] yFinal;
 	
 	logic nextBlackNotWhite;
 	logic [9:0] nextX, nextNextX;
-	logic [8:0] nextY, nextNextY;
+	logic [8:0] y, nextY, nextNextY;
 	logic [10:0] array [10:0];
 	
 	// give coordinates of grid of blocks visible to player
 	logic [3:0] xBlockCoord, nextXBlockCoord;
-	logic [5:0] yBlockCoord, nextYBlockCoord;
+	logic [4:0] yBlockCoord, nextYBlockCoord;
 	
 	// for RAM usage
 	assign rdaddress = yBlockCoord;
+	
+	// for changing printing location
+	assign yFinal = y + 120; 
 	
 	// give coordinates of pixels inside of each block to be drawn
 	logic [3:0] xInternal, yInternal, nextXInternal, nextYInternal;
 	
 	
-	enum {ready, loop, draw, erase, readMem} ps, ns;
+	enum {ready, loop, draw, erase, readMem, readMem2} ps, ns;
 	
 	always_comb begin
 		nextXBlockCoord = xBlockCoord;
@@ -52,7 +55,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
 					if (yInternal == 4'd9) begin
-						if (nextYBlockCoord == 0) 
+						if (nextXBlockCoord == 1) 
 							ns = readMem;
 						else
 							ns = loop;
@@ -71,7 +74,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 				if (xInternal == 4'd9) begin
 					nextXInternal = 0;
 					if (yInternal == 4'd9) begin
-						if (nextYBlockCoord == 0)
+						if (nextXBlockCoord == 1)
 							ns = readMem;
 						else
 							ns = loop;
@@ -87,13 +90,15 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 				end // else begin
 			end // erase: begin
 			readMem:
+				ns = readMem2;
+			readMem2:
 				ns = loop;
 		endcase // case(ps)
 		
 		// datapath outputs
 		// initializeOffset
 		if (ps == ready && ns == readMem) begin
-			nextXBlockCoord = 0;
+			nextXBlockCoord = 1;
 			nextYBlockCoord = 0;
 		end // if (ps == ready && ns == readMem) begin
 		
@@ -105,7 +110,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 		
 		// updateCoords
 		else if (ps == draw || ps == erase) begin
-			nextNextX = (12 * xBlockCoord) + 261 + xInternal;
+			nextNextX = (12 * xBlockCoord) + 249 + xInternal;
 			nextNextY = (12 * yBlockCoord) + 1 + yInternal;
 		end // else if (ps == draw || ps == erase) begin
 		
@@ -117,9 +122,9 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 		
 		// incrBlockCoords
 		if ((ps == draw || ps == erase) && (ns == loop || ns == readMem)) begin
-			if (xBlockCoord == 4'd9) begin
-				nextXBlockCoord = 0;
-				if (yBlockCoord == 6'd39)
+			if (xBlockCoord == 4'd10) begin
+				nextXBlockCoord = 1;
+				if (yBlockCoord == 6'd19)
 					nextYBlockCoord = 0;
 				else 
 					nextYBlockCoord = yBlockCoord + 1'b1;
@@ -133,7 +138,7 @@ module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, y)
 	always_ff @(posedge Clock) begin
 		if (Reset) begin
 			ps <= ready;
-			xBlockCoord <= 0;
+			xBlockCoord <= 1;
 			yBlockCoord <= 0;
 			xInternal <= 0;
 			yInternal <= 0;
@@ -177,11 +182,11 @@ endmodule // module blockDrawer
 
 module blockDrawer_testbench();
 	logic Clock, Reset, enable;
-	logic [9:0] dataIn;
+	logic [11:0] dataIn;
 	logic blackNotWhite;
 	logic [5:0] rdaddress;
 	logic [9:0] x;
-	logic [8:0] y;
+	logic [8:0] yFinal;
 	
 	// Set up the clock.
 	parameter CLOCK_PERIOD=100;
@@ -196,7 +201,7 @@ module blockDrawer_testbench();
 		Reset = 1'b1;	@(posedge Clock);
 		Reset = 1'b0;	@(posedge Clock);
 		enable = 1'b1;	@(posedge Clock);
-		dataIn = 19'b1001000001;	@(posedge Clock);
+		dataIn = 12'b010010000010;	@(posedge Clock);
 		@(posedge Clock); @(posedge Clock);
 		@(posedge Clock); @(posedge Clock);
 		@(posedge Clock); @(posedge Clock);
