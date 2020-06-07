@@ -1,11 +1,10 @@
-/*module playfield(Clock, reset, piece_ready, motion_enable, motion, address_b, 
-						rden_b, q_b, piece_request);
-	input logic Clock, reset, motion_enable, piece_ready;
+module playfield(Clock, reset, motion_enable, motion, address_b, 
+						rden_b, q_b);
+	input logic Clock, reset, motion_enable;
 	input logic [1:0] motion;
 	input logic [4:0] address_b;
 	input logic rden_b; 
 	output logic [11:0] q_b;
-	output logic piece_request;
 	
 	logic [4:0] next_x, loc_x, next_y, loc_y, do_collision, no_collision;
 	logic [4:0] piece[5:0];
@@ -17,6 +16,8 @@
 	logic [4:0] address_a;
 	logic [11:0] data_a, q_a, collide;
 	logic rden_a, wren_a, down_request;
+	logic piece_request, piece_ready;
+	logic [4:0] block[5:0];
 	
 	assign collide = ((q_a & decode_out[0:11]) > 12'b0);
 	
@@ -32,10 +33,12 @@
 	// default:
 	next_x = loc_x;
 	next_y = loc_y;
-	next_piece = piece;
 	do_collision = 1'b0;
+	next_piece = block;
 		case(ps) 
-			waiting: 
+			waiting: begin
+			if(piece_ready)
+				next_piece = piece;
 			if(down_request) 
 				ns = down;
 			else begin
@@ -52,42 +55,70 @@
 				end
 				else
 					ns = waiting;
+				end
 			end
 			down:
 			begin
+				if(piece_ready)
+					next_piece = piece;	
+					
 				next_y = loc_y + 5'b00001;	
 				do_collision = 5'b00001;
 				ns = waiting;	
 			end
 			left:
 			begin
+				if(piece_ready)
+					next_piece = piece;	
+					
 				next_x = loc_x - 5'b00001;
 				do_collision = 5'b00001;
 				ns = waiting;
 			end
 			right:
 			begin
+				if(piece_ready)
+					next_piece = piece;	
+					
 				next_x = loc_x + 1'b1;
 				do_collision = 1'b1;
 				ns = waiting;
 			end
 			cw:
 			begin
-				next_piece[5:3] = piece[2:0];
-				for (i = 0; i < 3; i++) begin
-					next_piece[i] = - piece[i + 3];				
+				if(piece_ready) begin
+					next_piece[5:3] = piece[2:0];
+					for (i = 0; i < 3; i++) begin
+						next_piece[i] = - piece[i + 3];				
+					end
+					do_collision = 1'b1;
+					ns = waiting;
+				end else begin
+					next_piece[5:3] = block[2:0];
+					for (i = 0; i < 3; i++) begin
+						next_piece[i] = - block[i + 3];				
+					end
+					do_collision = 1'b1;
+					ns = waiting;		
 				end
-				do_collision = 1'b1;
-				ns = waiting;
 			end
 			ccw: 
 			begin
-				next_piece[2:0] = piece[5:3];
-				for (i = 0; i < 3; i++) begin
-					next_piece[i + 3] = - piece[i];				
+				if(piece_ready) begin
+					next_piece[2:0] = piece[5:3];
+					for (i = 0; i < 3; i++) begin
+						next_piece[i + 3] = - piece[i];				
+					end
+					do_collision = 1'b1;
+					ns = waiting;
+				end else begin
+					next_piece[2:0] = block[5:3];
+					for (i = 0; i < 3; i++) begin
+						next_piece[i + 3] = - block[i];				
+					end
+					do_collision = 1'b1;
+					ns = waiting;			
 				end
-				do_collision = 1'b1;
-				ns = waiting;
 			end
 		endcase
 	end
@@ -98,9 +129,9 @@
 		else begin
 			ps <= ns;
 			if(no_collision)
-				piece <= next_piece;
+				block <= next_piece;
 			else
-				piece <= piece;
+				block <= block;
 		end
 	end
 	
@@ -110,7 +141,8 @@
 	
 	always_comb begin
 	//default:
-		address_a = 11'bX;
+		address_a = 5'bX;
+		data_a = 12'b0;
 		decode_in = 4'b0;
 		wren_a = 1'b0;
 		rden_a = 1'b1;
@@ -251,6 +283,8 @@
 						nextcounter = counter + 2'b01;
 					if(counter == 2'b11) 
 						ns_col = write0;	
+					else
+						ns_col = check3;
 				end
 				write0:
 				begin
@@ -350,9 +384,9 @@
 	enum {create, waiting_create, move_down} ps_create, ns_create;
 	always_comb begin
 	// default:
-	motion_enable = 1'b0;
 	piece_request = 1'b0;
 	down_request = 1'b0;
+	create_nextcounter = 24'b0;
 		case(ps_create) 
 			create:
 				begin
@@ -364,12 +398,15 @@
 				end
 			waiting_create:
 				begin
-				create_nextcounter = create_counter + 1;
-				motion_enable = 1'b1;
-				if(create_counter == 24'b0)
-					ns_create = move_down;
-				else 
-					ns_create = waiting_create;
+				if(motion_enable) begin
+					create_nextcounter = create_counter + 24'b000000000000000000001;
+					if(create_counter == 24'b0)
+						ns_create = move_down;
+					else
+						ns_create = waiting_create;
+				end
+				else
+					ns_create = waiting_create; 
 				end
 			move_down:
 				begin
@@ -384,16 +421,15 @@
 	end
 	
 	always_ff @(posedge Clock) begin
-		if(reset)
+		if(reset) begin
 			ps_create <= create;
+			create_counter <= 24'b0;
+		end
 		else begin
 			ps_create <= ns_create;
 			loc_x <= next_x;
 			loc_y <= next_y;
-			piece <= next_piece;
+			create_counter <= create_nextcounter;
 		end
 	end
-	
 endmodule
-
-*/
