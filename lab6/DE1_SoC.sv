@@ -71,8 +71,8 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50,
 	
 
 	
-//	MusicPlayer music (.CLOCK_50, .CLOCK2_50, .FPGA_I2C_SCLK, .FPGA_I2C_SDAT, .AUD_XCK, .AUD_DACLRCK, .AUD_ADCLRCK, .AUD_BCLK,
-//						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable);
+	MusicPlayer music (.CLOCK_50, .CLOCK2_50, .FPGA_I2C_SCLK, .FPGA_I2C_SDAT, .AUD_XCK, .AUD_DACLRCK, .AUD_ADCLRCK, .AUD_BCLK,
+						  .AUD_ADCDAT, .AUD_DACDAT, .reset(~KEY[0]), .MusicEnable(~KEY[3]));
 
 
 	GraphicsTestRAM gtr (.rdaddress(address_b), .wraddress(12'd0), .clock(CLOCK_50), .q(q_b), .wren(1'b1), .data({~KEY[3], SW, ~KEY[2]}));
