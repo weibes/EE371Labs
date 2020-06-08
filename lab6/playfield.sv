@@ -19,7 +19,7 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	logic piece_request, piece_ready;
 	logic [4:0] newpiece[5:0];
 	
-	logic piece_is_moving;
+	//logic piece_is_moving;
 	
 	assign collide = ((q_a & decode_out[0:11]) > 12'b0);
 	
@@ -111,7 +111,7 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	end
 	
 	// piece_is_moving detects when a piece is moving, for logic for piece moving graphically
-	assign piece_is_moving = (ps == down);
+	//assign piece_is_moving = (ps == down);        // we added this to replace the motion_enable
 	
 	
 	// FSM for detecting collisions and moving the pieces
@@ -121,7 +121,7 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	always_comb begin
 	//default:
 		address_a = 5'bX;
-		data_a = 12'b0;
+		data_a = 12'b0;               // we set data_a to default to 0
 		decode_in = 4'b0;
 		wren_a = 1'b0;
 		rden_a = 1'b1;
@@ -263,7 +263,7 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 					if(counter == 2'b11) 
 						ns_col = write0;	
 					else
-						ns_col = check3;
+						ns_col = check3;            // this one change we made to compile
 				end
 				write0:
 				begin
@@ -360,7 +360,7 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	end
 	
 	// FSM for creating and moving the pieces on the screen
-	enum {create, waiting_create, moving_down_delay, move_down} ps_create, ns_create;
+	enum {create, waiting_create, move_down} ps_create, ns_create;
 	always_comb begin
 	// default:
 	piece_request = 1'b0;
@@ -375,27 +375,25 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 				else
 					ns_create = create;
 				end
-			waiting_create:
-				begin
-				if (ns_col == waiting_col)
-					ns_create = create;
-				else begin
-					if(piece_is_moving)
-						ns_create = moving_down_delay;
-					else
-						ns_create = waiting_create; 				
+			waiting_create:        //changes made starting from here
+				begin   
+					//if(motion_enable) begin
+						create_nextcounter = create_counter + 24'b000000000000000000001;
+						if(create_counter == 24'b0)
+							ns_create = move_down;
+						else
+							ns_create = waiting_create;
+					//end
 				end
-				end
-			moving_down_delay:
-				begin
-				create_nextcounter = create_counter + 24'b000000000000000000001;
+		//	moving_down_delay:
+	//			begin
 				// debug line, remove for actual
 				//if(create_counter == 24'b0)
-				if (create_counter == 24'h000005)
-					ns_create = move_down;	
-				else
-					ns_create = moving_down_delay;
-				end
+			//	if (create_counter == 24'h000005)
+			//		ns_create = move_down;	
+			//	else
+			//		ns_create = moving_down_delay;
+		//		end                          // until here
 			move_down:
 				begin
 				create_nextcounter = 1;
@@ -411,12 +409,12 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	always_ff @(posedge Clock) begin
 		if(reset) begin
 			ps_create <= create;
-			create_counter <= 24'b0;
-			loc_x <= 0;
-			loc_y <= 0;
+			create_counter <= 24'b0;            // added this
+			loc_x <= 0;                         // added this
+			loc_y <= 0;                         // added this
 		end
-		else begin
-			ps_create <= ns_create;
+		else begin  
+			ps_create <= ns_create;             // added these
 			loc_x <= next_x;
 			loc_y <= next_y;
 			create_counter <= create_nextcounter;
