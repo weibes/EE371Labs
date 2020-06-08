@@ -19,7 +19,12 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	logic piece_request, piece_ready;
 	logic [4:0] block[5:0];
 	
+	logic piece_is_moving;
+	
+	
 	assign collide = ((q_a & decode_out[0:11]) > 12'b0);
+	
+	
 	
 	pof_RAM storage(.address_a, .address_b, .clock(Clock), .data_a, .data_b(11'b0), 
 						 .rden_a, .rden_b, .wren_a, .wren_b(1'b0), .q_a, .q_b);
@@ -134,6 +139,10 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 				block <= block;
 		end
 	end
+	
+	// piece_is_moving detects when a piece is moving, for logic for piece moving graphically
+	assign piece_is_moving = (ps == down);
+	
 	
 	// FSM for detecting collisions and moving the pieces
 	enum {waiting_col, clear0, clear1, clear2, clear3, 
@@ -381,12 +390,12 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	end
 	
 	// FSM for creating and moving the pieces on the screen
-	enum {create, waiting_create, move_down} ps_create, ns_create;
+	enum {create, waiting_create, moving_down_delay, move_down} ps_create, ns_create;
 	always_comb begin
 	// default:
 	piece_request = 1'b0;
 	down_request = 1'b0;
-	create_nextcounter = 24'b0;
+	create_nextcounter = create_counter;
 		case(ps_create) 
 			create:
 				begin
@@ -401,16 +410,21 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 				if (ns_col == waiting_col)
 					ns_create = create;
 				else begin
-					if(motion_enable) begin
-						create_nextcounter = create_counter + 24'b000000000000000000001;
-						if(create_counter == 24'b0)
-							ns_create = move_down;
-						else
-							ns_create = waiting_create;
-					end
+					if(piece_is_moving)
+						ns_create = moving_down_delay;
 					else
-						ns_create = waiting_create; 
-					end
+						ns_create = waiting_create; 				
+				end
+				end
+			moving_down_delay:
+				begin
+				create_nextcounter = create_counter + 24'b000000000000000000001;
+				// debug line, remove for actual
+				//if(create_counter == 24'b0)
+				if (create_counter == 24'h000005)
+					ns_create = move_down;	
+				else
+					ns_create = moving_down_delay;
 				end
 			move_down:
 				begin
