@@ -17,19 +17,16 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	logic [11:0] data_a, q_a, collide;
 	logic rden_a, wren_a, down_request;
 	logic piece_request, piece_ready;
-	logic [4:0] block[5:0];
+	logic [4:0] newpiece[5:0];
 	
 	logic piece_is_moving;
 	
-	
 	assign collide = ((q_a & decode_out[0:11]) > 12'b0);
-	
-	
 	
 	pof_RAM storage(.address_a, .address_b, .clock(Clock), .data_a, .data_b(11'b0), 
 						 .rden_a, .rden_b, .wren_a, .wren_b(1'b0), .q_a, .q_b);
 	decoder_4_to_16 decode(.in(decode_in), .out(decode_out));
-	piece_generate pieces (.Clock, .reset, .request(piece_request), .arr_out(piece), .data_ready(piece_ready));
+	piece_generate pieces (.Clock, .reset, .request(piece_request), .arr_out(newpiece), .data_ready(piece_ready));
 	
 	// the internal FSM for controlling the playfield.
 	enum {waiting, down, left, right, cw, ccw} ps, ns;
@@ -39,11 +36,11 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 	next_x = loc_x;
 	next_y = loc_y;
 	do_collision = 1'b0;
-	next_piece = block;
+	next_piece = piece;
 		case(ps) 
 			waiting: begin
 			if(piece_ready)
-				next_piece = piece;
+				next_piece = newpiece;
 			if(down_request) 
 				ns = down;
 			else begin
@@ -64,66 +61,39 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 			end
 			down:
 			begin
-				if(piece_ready)
-					next_piece = piece;	
-					
 				next_y = loc_y + 5'b00001;	
 				do_collision = 5'b00001;
 				ns = waiting;	
 			end
 			left:
-			begin
-				if(piece_ready)
-					next_piece = piece;	
-					
+			begin	
 				next_x = loc_x - 5'b00001;
 				do_collision = 5'b00001;
 				ns = waiting;
 			end
 			right:
 			begin
-				if(piece_ready)
-					next_piece = piece;	
-					
 				next_x = loc_x + 1'b1;
 				do_collision = 1'b1;
 				ns = waiting;
 			end
 			cw:
 			begin
-				if(piece_ready) begin
 					next_piece[5:3] = piece[2:0];
 					for (i = 0; i < 3; i++) begin
 						next_piece[i] = - piece[i + 3];				
 					end
 					do_collision = 1'b1;
 					ns = waiting;
-				end else begin
-					next_piece[5:3] = block[2:0];
-					for (i = 0; i < 3; i++) begin
-						next_piece[i] = - block[i + 3];				
-					end
-					do_collision = 1'b1;
-					ns = waiting;		
-				end
 			end
 			ccw: 
 			begin
-				if(piece_ready) begin
 					next_piece[2:0] = piece[5:3];
 					for (i = 0; i < 3; i++) begin
 						next_piece[i + 3] = - piece[i];				
 					end
 					do_collision = 1'b1;
 					ns = waiting;
-				end else begin
-					next_piece[2:0] = block[5:3];
-					for (i = 0; i < 3; i++) begin
-						next_piece[i + 3] = - block[i];				
-					end
-					do_collision = 1'b1;
-					ns = waiting;			
-				end
 			end
 		endcase
 	end
@@ -134,9 +104,9 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 		else begin
 			ps <= ns;
 			if(no_collision)
-				block <= next_piece;
+				piece <= next_piece;
 			else
-				block <= block;
+				piece <= piece;
 		end
 	end
 	
