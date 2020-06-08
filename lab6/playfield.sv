@@ -398,15 +398,19 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 				end
 			waiting_create:
 				begin
-				if(motion_enable) begin
-					create_nextcounter = create_counter + 24'b000000000000000000001;
-					if(create_counter == 24'b0)
-						ns_create = move_down;
+				if (ns_col == waiting_col)
+					ns_create = create;
+				else begin
+					if(motion_enable) begin
+						create_nextcounter = create_counter + 24'b000000000000000000001;
+						if(create_counter == 24'b0)
+							ns_create = move_down;
+						else
+							ns_create = waiting_create;
+					end
 					else
-						ns_create = waiting_create;
-				end
-				else
-					ns_create = waiting_create; 
+						ns_create = waiting_create; 
+					end
 				end
 			move_down:
 				begin
@@ -424,6 +428,8 @@ module playfield(Clock, reset, motion_enable, motion, address_b,
 		if(reset) begin
 			ps_create <= create;
 			create_counter <= 24'b0;
+			loc_x <= 0;
+			loc_y <= 0;
 		end
 		else begin
 			ps_create <= ns_create;
@@ -451,13 +457,18 @@ module playfield_testbench();
 	
 	playfield dut (.*);
 	
-	integer i;
-	
+	integer i, addressRead;
 	initial begin
-		reset = 1;			@(posedge Clock);
-		reset = 0;			@(posedge Clock);
+		addressRead = 0;
+		reset = 1;	rden_b = 1;	motion = 2'b00;	@(posedge Clock);
+		reset = 0;	motion_enable = 0;				@(posedge Clock);
 		for (i = 0; i < 1000; i++) begin
 			@(posedge Clock);
+			if (addressRead == 19)
+				addressRead = 0;
+			else
+				addressRead++;
+			address_b = addressRead;
 		end
 		$stop;
 	end // initial begin

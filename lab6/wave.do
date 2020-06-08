@@ -19,9 +19,9 @@ add wave -noupdate -expand -group internals /playfield_testbench/dut/decode_in
 add wave -noupdate -expand -group internals /playfield_testbench/dut/decode_out
 add wave -noupdate -expand -group internals /playfield_testbench/dut/counter
 add wave -noupdate -expand -group internals /playfield_testbench/dut/nextcounter
-add wave -noupdate -expand -group internals -radix hexadecimal /playfield_testbench/dut/create_counter
-add wave -noupdate -expand -group internals -radix hexadecimal /playfield_testbench/dut/create_nextcounter
-add wave -noupdate -expand -group internals -radix unsigned /playfield_testbench/dut/address_a
+add wave -noupdate -expand -group internals /playfield_testbench/dut/create_counter
+add wave -noupdate -expand -group internals /playfield_testbench/dut/create_nextcounter
+add wave -noupdate -expand -group internals /playfield_testbench/dut/address_a
 add wave -noupdate -expand -group internals /playfield_testbench/dut/data_a
 add wave -noupdate -expand -group internals /playfield_testbench/dut/q_a
 add wave -noupdate -expand -group internals /playfield_testbench/dut/collide
@@ -38,9 +38,9 @@ add wave -noupdate -expand -group internals /playfield_testbench/dut/ns_col
 add wave -noupdate -expand -group internals /playfield_testbench/dut/ps_create
 add wave -noupdate -expand -group internals /playfield_testbench/dut/ns_create
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {28522 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1828 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 194
+configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -54,4 +54,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {28365 ps} {29323 ps}
+WaveRestoreZoom {1469 ps} {2469 ps}
