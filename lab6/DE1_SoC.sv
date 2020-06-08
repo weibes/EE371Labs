@@ -65,13 +65,13 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 	output logic AUD_DACDAT;
 	
 	
-	logic piece_ready, motion_enable, piece_request;
+	logic piece_ready, motion_enable, motion_enable_out, motion_enable_1, motion_enable_2, piece_request;
 	logic [1:0] motion;
 	logic [4:0] address_b;
 	logic [11:0] q_b;
 	
 	
-	playfield field (.Clock(CLOCK_50), .reset(~KEY[0]), .motion_enable, .motion, .address_b,
+	playfield field (.Clock(CLOCK_50), .reset(~KEY[0]), .motion_enable(motion_enable_out), .motion, .address_b,
 						  .rden_b(1'b1), .q_b);
 	
 
@@ -90,8 +90,15 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 	// debug for keyboard
 	seg7 displayTest (.bcd({2'b00, motion}), .leds(HEX0));
 	
+	// motion enable on for 1 clock cycle
+	always_comb begin
+		motion_enable_out = motion_enable_1 &~ motion_enable_2;
+	end
+	
 	logic [3:0] cnt;
 	always_ff @(posedge CLOCK_50) begin
+		motion_enable_1 <= motion_enable;
+		motion_enable_2 <= motion_enable_1;
 		if (~KEY[0])
 			cnt <= 4'b0;
 		else if (motion_enable)
