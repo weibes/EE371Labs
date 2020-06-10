@@ -1,6 +1,16 @@
 /* 
- * Module MusicPlayer plays music during gameplay
-*/
+ * Module MusicPlayer plays music during gameplay from the input interface and plays it to the output audio interface
+ * inputs:
+ * reset is reset
+ * CLOCK_50 is the clock
+ * MusicEnable is the enable bit for whether the music should play
+ * CLOCK2_50 is another clock
+ * AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK, AUD_ADCDAT are input data from the audio I/O
+ * outputs:
+ * FPGA_I2C_SCLK, AUD_XCK, AUD_DACDAT are audio codec data taht connects to the audio I/O
+ * inout:
+ *  FPGA_I2C_SDAT is data going to and from the audio I/O and audio codec
+ */
 
 module MusicPlayer(CLOCK_50, CLOCK2_50, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK,
 						  AUD_ADCDAT, AUD_DACDAT, reset, MusicEnable);
@@ -31,19 +41,19 @@ module MusicPlayer(CLOCK_50, CLOCK2_50, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, A
 		waiting_read: begin
 			if(read_ready && MusicEnable) ns = reading;
 			else ns = waiting_read;
-		end
+		end // waiting_read: begin
 		reading: begin
 			read = 1'b1;
 			ns = waiting_write;
-		end
+		end // reading: begin
 		waiting_write: begin
 			if(write_ready && MusicEnable) ns = writing;
 			else ns = waiting_write;
-		end
+		end // waiting_write: begin
 		writing: begin
 			write = 1'b1;
 			ns = waiting_read;
-		end
+		end // writing: begin
 		endcase
 	
 	end //always_comb
@@ -53,12 +63,12 @@ module MusicPlayer(CLOCK_50, CLOCK2_50, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, A
 			ps <= waiting_read;
 		else begin
 			ps <= ns;
-			if(read) begin
+			if (read) begin
 				writedata_left <= readdata_left;
 				writedata_right <= readdata_right;
-			end
-		end
-	end //always_ff
+			end // if (read) begin
+		end // else begin
+	end // always_ff @(posedge CLOCK_50) begin
 	
 	// instantiates the connected modules within the top level module of task1
 	clock_generator my_clock_gen(

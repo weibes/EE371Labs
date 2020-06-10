@@ -1,3 +1,16 @@
+/* module blockDrawer draws the blocks from the game logic RAM onto the current playfield
+ * for the player to see where the pieces are currently located
+ * inputs:
+ * Clock is the clock
+ * Reset is a reset
+ * enable is from the graphics controller stating when the blockDrawer can start drawing blocks
+ * dataIn is the data from the game logic RAM that gives one row of block data
+ * outputs:
+ * rdaddress is the address in the gamelogic RAM to read from (which represents each row of the playfield)
+ * blackNotWhite tells the VGA driver if it should draw a black or white pixel
+ * x tells the VGA driver what x coordinate to draw to on the 480x640 monitor
+ * yFinal tells the VGA driver what y coordinate to draw to on the 480x640 monitor
+ */
 `timescale 1 ps / 1 ps
 module blockDrawer(Clock, Reset, enable, rdaddress, dataIn, blackNotWhite, x, yFinal);
 	input logic Clock, Reset, enable;

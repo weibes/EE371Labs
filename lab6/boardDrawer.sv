@@ -1,3 +1,16 @@
+/* module boardDrawer handles drawing the background board for the graphics, so the player can
+ * see where and where they can't move pieces
+ * inputs:
+ * clock is the clock
+ * reset is the reset
+ * enable states when the board can start drawing the background
+ * outputs:
+ * blackNotWhite determines whether the VGA driver should draw a black or white pixel
+ * doneBit tells the controller when the boardDrawer is done drawing the board
+ * x tells the VGA driver what x coordinate to draw to on the 480x640 monitor
+ * yFinal tells the VGA driver what y coordinate to draw to on the 480x640 monitor
+ */
+
 `timescale 1 ps / 1 ps
 module boardDrawer(Clock, Reset, enable, x, yFinal, blackNotWhite, doneBit);
 	input logic Clock, Reset, enable;

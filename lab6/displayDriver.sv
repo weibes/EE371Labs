@@ -1,3 +1,14 @@
+/* module displayDriver handles all of the graphics of the game, displaying the current play field data and where pieces are
+ * currently located for the player to view and react to.
+ * inputs: 
+ *	dataIn is the data from the game logic RAM that gives data on the current row of blocks being read
+ * Clock is the clock
+ * REset is the reset
+ * outputs:
+ * rdaddress is the addres to the game logic RAM that reads a row of the game board, and where to draw pieces
+ * VGA_R, VGA_G, VGA_B, VGA_BLANK_n, VGA_CLK, VGA_HS, VGA_SYNC_n, VGA_VS are all output data to go to the VGA display
+ */
+
 `timescale 1 ps / 1 ps
 module displayDriver(dataIn, rdaddress, Clock, Reset,  VGA_R, VGA_G, VGA_B, VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
 	input logic [11:0] dataIn;
