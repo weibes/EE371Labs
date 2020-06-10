@@ -87,10 +87,10 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 
 	keyboardInput keyboard (.Clock(CLOCK_50), .Reset(~KEY[0]), .motion, .motion_enable, .PS2_DAT, .PS2_CLK);
 	
-	// debug for keyboard
+	// instantiate the debugger for keyboard signals.
 	seg7 displayTest (.bcd({2'b00, motion}), .leds(HEX0));
 	
-	// motion enable on for 1 clock cycle
+	// FSM for the motion enable on for 1 clock cycle
 	always_comb begin
 		motion_enable_out = motion_enable_1 &~ motion_enable_2;
 	end
@@ -106,6 +106,6 @@ module DE1_SoC (KEY, SW, CLOCK_50, CLOCK2_50, PS2_DAT, PS2_CLK,
 	end
 	
 	seg7 count (.bcd(cnt), .leds(HEX1));
-	// end debug stuff
+	// deinstaniate and end debugger for keyboard signals.
 	
 endmodule // module DE1_SoC
