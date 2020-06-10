@@ -1,26 +1,46 @@
+/* A piece_generate module that generates the 5 different pieces of a tetris block
+ * and stores it in array, which contains the coordinate system, which can be mapped
+ * to create the actual blocks of the tetris on display.
+ * 
+ * Inputs:
+ *   Clock - the synchronous clock signal.
+ *   reset - the reset state for the FSMs and used to syncronyze with the clock.
+ *   request - this is the signal that is coming from the playfield, which is asserted when the user
+ *					requests a piece of tetris block.
+ *
+ * Outputs:
+ * 	arr_out - this is the array that contains the coordinate dimensions of tetris blocks that can be mapped
+ *					 to actually create those blocks on display.
+ *    data_ready - this is the ready signal from the system that asserts when a block is ready to be display
+ *                 after the proper operations like random rotations.
+ */
 module piece_generate(Clock, reset, request, arr_out, data_ready); 
 	input logic Clock, reset, request;
 	output logic [4:0] arr_out[5:0];
 	output logic data_ready;
 	
+	// Declare logic statements and variables. Connect the internal ports
+	// with respective input and output ports.
 	logic [4:0] arr[5:0];
 	logic [2:0] shape, read_addr;
 	logic [1:0] rotate;
 	logic do_xy, done_xy;
 	logic [4:0] read, q, inc;
 	
-	// the read signal = 6 * read_addr
+	// the read signal = 6 * read_addr + inc, used to feed into the ROM's address.
 	assign read = {read_addr, 2'b0} + {1'b0, read_addr, 1'b0} + inc;
 	
+	// instantiate the random number generator that rotates the blocks everytime a block is ready
+	// instantiates the ROM that outputs the array coordiates for each of the pieces that forms the tetris blocks.
 	LFSR10 random(.Clock, .reset, .Q_out1(shape), .Q_out2(rotate));
 	ROM rom(.address(read), .clock(Clock), .rden(1'b1), .q);
 	
-	// choose random rotations for the blocks.
+	// algorthmic design that chooses a random rotation for the blocks being generated. 
 	always_comb begin
 		integer i;
 		case(rotate) 
-			2'b00: 
-			begin // no rotate
+			2'b00: // no rotate
+			begin
 				arr_out = arr;
 			end
 			2'b01: // 90 ccw rotates
@@ -44,9 +64,9 @@ module piece_generate(Clock, reset, request, arr_out, data_ready);
 				end
 			end
 		endcase
-	end
+	end //always_comb
 	
-	// FSM for controlling the data read cycle.
+	// FSM for controlling the data read cycles. Controls the internals for the ROM's data storage.
 	enum {waiting, starting, reading} ps, ns;
 	always_comb begin
 	// default:
@@ -71,7 +91,7 @@ module piece_generate(Clock, reset, request, arr_out, data_ready);
 					ns = reading;
 			end
 		endcase
-	end
+	end //always_comb
 	
 	always_ff @(posedge Clock) begin
 		if(reset) 
@@ -82,9 +102,10 @@ module piece_generate(Clock, reset, request, arr_out, data_ready);
 			if(ps == starting)
 				read_addr <= shape;
 		end
-	end
+	end //always_ff
 	
-	// FSM for reading the offsets from ROM - xy values.
+	// FSM for reading the offsets from ROM - the xy coordinate system array giving the 
+	// specific dimensional coordiates for the tetris blocks in a array.
 	enum {waitingxy, waiting1, waiting2, first, second, third, fourth, fifth, sixth} psxy, nsxy;
 	
 	always_comb begin 
@@ -127,7 +148,7 @@ module piece_generate(Clock, reset, request, arr_out, data_ready);
 				nsxy = waitingxy;	
 			end
 		endcase
-	end
+	end // always_comb 
 
 	always_ff @(posedge Clock) begin
 		if(reset) 
@@ -147,11 +168,14 @@ module piece_generate(Clock, reset, request, arr_out, data_ready);
 			if(psxy == sixth)
 				arr[0] <= q;
 		end
-	end
-endmodule
+	end // always_ff
+	
+endmodule //piece_generate
 
-
+// timescaling the testbench to synch with the library memory module.
 `timescale 1 ps / 1 ps
+/* testbench for the piece_generate that tests the overall function of the module and outputs 
+   produced given the varied inputs. Port connections *see piece_generate module*. */
 module piece_generate_testbench();
 	logic Clock, reset, request;
 	logic [4:0] arr_out[5:0];	
@@ -160,10 +184,10 @@ module piece_generate_testbench();
 	piece_generate dut(.Clock, .reset, .request, .arr_out, .data_ready);
 	
 	parameter CLOCK_PERIOD = 50;
-		initial begin
-			Clock <= 0;
-			forever #(CLOCK_PERIOD/2) Clock <= ~Clock;
-	end // initial
+	initial begin
+		Clock <= 0;
+		forever #(CLOCK_PERIOD/2) Clock <= ~Clock;
+	end // initial begin
 	
 	initial begin
 		reset <= 1'b0;									@(posedge Clock);
@@ -220,8 +244,7 @@ module piece_generate_testbench();
 		request <= 1'b0;								@(posedge Clock);	
 		repeat(15) 										@(posedge Clock);
 		
-		
 	$stop;
-	end
-endmodule
+	end //initial begin
+endmodule //piece_generate_testbench
 
